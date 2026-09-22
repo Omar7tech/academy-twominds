@@ -10,13 +10,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const contacts = [
-  { name: "Omar Abi Farraj", phone: "+96171387946", display: "+961 71 387 946" },
-  { name: "Nassir Ghraizi", phone: "+96181670536", display: "+961 81 670 536" },
+  { name: "Omar Abi Farraj", role: "Senior Software Engineer", subject: "Development", initials: "OA", phone: "+96171387946", display: "+961 71 387 946" },
+  { name: "Nassir Ghraizi", role: "Expert Cybersecurity Researcher", subject: "Cybersecurity", initials: "NG", phone: "+96181670536", display: "+961 81 670 536" },
 ];
 
 function ContactOptions({ message = "Hi Two Minds Academy! I'd like to know more about your courses." }: { message?: string }) {
   return <div className="contact-options">{contacts.map(person => <article className="contact-person" key={person.phone}>
-    <div className="contact-person-heading"><span className="contact-initials" aria-hidden="true">{person.name.split(" ").map(n => n[0]).join("")}</span><div><h3>{person.name}</h3><a className="phone-number" href={`tel:${person.phone}`} aria-label={`Call ${person.name} at ${person.display}`}>{person.display}</a></div></div>
+    <div className="contact-card-top"><span className="contact-subject">{person.subject}</span><span className="contact-monogram" aria-hidden="true">{person.initials}</span></div>
+    <div className="contact-person-heading"><div><h3>{person.name}</h3><p className="contact-role">{person.role}</p></div></div>
+    <a className="phone-number" href={`tel:${person.phone}`} aria-label={`Call ${person.name} at ${person.display}`}><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m7 3 3 5-3 2c2 4 3 5 7 7l2-3 5 3c-1 5-4 5-8 3C6 17 2 11 3 6c0-2 2-3 4-3Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></svg>{person.display}</a>
     <div className="contact-actions"><a className="button button-dark" href={`https://wa.me/${person.phone.slice(1)}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${person.name}`}>WhatsApp <Arrow diagonal /></a><a className="call-link" href={`tel:${person.phone}`} aria-label={`Call ${person.name}`}>Call <Arrow diagonal /></a></div>
   </article>)}</div>;
 }
@@ -192,7 +194,7 @@ export default function Academy() {
         ["Where do cybersecurity exercises happen?", "In isolated labs and environments you have explicit permission to test. Responsible practice, clear scope, reporting, and remediation are part of the learning process."],
       ].map(([question, answer]) => <details key={question}><summary>{question}<span className="faq-plus" aria-hidden="true">+</span></summary><p>{answer}</p></details>)}</div></section>
 
-      <section className="contact-section section wrap" id="contact"><div className="section-heading"><div><span className="eyebrow">LET’S PLAN YOUR NEXT STEP</span><h2>Questions?<br />Talk to us directly.</h2></div><p>Ask about courses, schedules, and fees.<br />Choose WhatsApp or call either of us.</p></div><ContactOptions /></section>
+      <section className="contact-section section wrap" id="contact"><div className="section-heading"><div><span className="eyebrow">LET’S PLAN YOUR NEXT STEP</span><h2>A real conversation.<br />The right guidance.</h2></div><p>Meet the people behind Two Minds Academy.<br />Ask us about courses, projects, schedules, or fees.</p></div><ContactOptions /></section>
 
       <section className="closing"><div className="wrap closing-inner"><div className="eyebrow"><span className="status-dot" /> YOUR NEXT CHAPTER STARTS WITH A CONVERSATION</div><div className="closing-row"><h2>Curiosity got you here.<br />Let’s see <span>where it goes.</span></h2><button className="closing-button" aria-label="Let’s find your path" onClick={() => enquire()}><Arrow diagonal /></button></div><div className="closing-caption"><p>Tell us where you are. We’ll help you work out what’s next.</p><button onClick={() => enquire()}>Let’s find your path <Arrow /></button></div></div></section>
     </main>
