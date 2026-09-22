@@ -1769,3 +1769,13 @@ button svg,a svg {
   .course-guidance { flex-direction:column; align-items:stretch; gap:18px; }
   .course-guidance .button { width:100%; font-size:15px; }
 }
+
+/* Scale decorative code to the card, including narrow tablet columns. */
+.discipline { container-type:inline-size; min-width:0; }
+.code-art { height:clamp(120px,40cqw,175px); gap:clamp(8px,3cqw,16px); }
+.code-bracket { font-size:clamp(58px,23cqw,100px); flex-shrink:0; }
+.code-art>div { font-size:clamp(18px,7.5cqw,30px); line-height:1.25; flex-shrink:0; }
+.code-arrow { padding-left:0; white-space:nowrap; }
+.code-arrow i { height:.85em; width:.3em; margin-left:.22em; transform:translateY(.08em); }
+.discipline h3 { font-size:clamp(24px,7.5cqw,39px); }
+.scan-line { width:min(240px,90%); }
