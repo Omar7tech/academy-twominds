@@ -1,7 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+const contacts = [
+  { name: "Omar Abi Farraj", phone: "+96171387946", display: "+961 71 387 946" },
+  { name: "Nassir Ghraizi", phone: "+96181670536", display: "+961 81 670 536" },
+];
+
+function ContactOptions({ message = "Hi Two Minds Academy! I'd like to know more about your courses." }: { message?: string }) {
+  return <div className="contact-options">{contacts.map(person => <article className="contact-person" key={person.phone}>
+    <div className="contact-person-heading"><span className="contact-initials" aria-hidden="true">{person.name.split(" ").map(n => n[0]).join("")}</span><div><h3>{person.name}</h3><a className="phone-number" href={`tel:${person.phone}`} aria-label={`Call ${person.name} at ${person.display}`}>{person.display}</a></div></div>
+    <div className="contact-actions"><a className="button button-dark" href={`https://wa.me/${person.phone.slice(1)}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${person.name}`}>WhatsApp <Arrow diagonal /></a><a className="call-link" href={`tel:${person.phone}`} aria-label={`Call ${person.name}`}>Call <Arrow diagonal /></a></div>
+  </article>)}</div>;
+}
 
 type Track = "Development" | "Cybersecurity";
 type Program = { title: string; level: string; description: string; modules: string[]; outcome: string; track: Track };
@@ -57,13 +75,13 @@ function Sculpture() {
 }
 
 export default function Academy() {
-  const [stage, setStage] = useState(0);
+  const [stage, setStage] = useState<number | null>(null);
+  const [courseTrack, setCourseTrack] = useState<Track | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [program, setProgram] = useState<Program | null>(null);
   const [modal, setModal] = useState<"enquire" | "program" | null>(null);
   const [interest, setInterest] = useState("Help me choose");
-  const [emailReady, setEmailReady] = useState(false);
-  const [emailLink, setEmailLink] = useState("");
+  const root = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -72,36 +90,58 @@ export default function Academy() {
     return () => { document.body.style.overflow = ""; };
   }, [modal]);
 
-  const enquire = (topic = "Help me choose") => { setInterest(topic); setEmailReady(false); setModal("enquire"); setMenuOpen(false); };
-  const showProgram = (item: Program) => { setProgram(item); setModal("program"); };
-  const browse = (track: Track) => { document.getElementById("paths")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); setInterest(track); };
+  const enquire = (topic = "Help me choose") => { setInterest(topic); setModal("enquire"); setMenuOpen(false); };
+  const showProgram = (item: Program, stageIndex: number) => { setStage(stageIndex); setProgram(item); setModal("program"); };
+  const browse = (track: Track) => { document.getElementById("paths")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); setInterest(track); setCourseTrack(track); };
 
-  function submitEnquiry(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const body = `Hi Two Minds Academy,\n\nI'd like to discuss a learning path.\n\nName: ${data.get("name")}\nEmail: ${data.get("email")}\nStarting point: ${data.get("stage")}\nInterest: ${data.get("interest")}\nGoal: ${data.get("goal") || "I'd like help choosing my next step."}\n\nPlease share the available format, schedule, and fees.`;
-    const link = `mailto:info@wearetwominds.com?subject=${encodeURIComponent("Academy enquiry — " + data.get("interest"))}&body=${encodeURIComponent(body)}`;
-    setEmailLink(link); setEmailReady(true); window.location.href = link;
-  }
+  useGSAP(() => {
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.from(".hero-copy > *", { y: 22, duration: .8, stagger: .08, ease: "power3.out", clearProps: "transform" });
+      gsap.from(".hero-art", { opacity: .5, scale: .97, duration: 1.1, ease: "power3.out", clearProps: "transform,opacity" });
+      gsap.fromTo(".sculpture", { rotation: -7 }, { rotation: 8, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 } });
+      root.current?.querySelectorAll(".section-heading, .discipline, .approach-steps article, .university, .contact-section, .closing-inner").forEach(element => {
+        gsap.from(element, { y: 26, opacity: .65, duration: .7, ease: "power3.out", clearProps: "transform,opacity", scrollTrigger: { trigger: element, start: "top 94%", once: true } });
+      });
+      gsap.from(".target", { scale: .7, opacity: .25, stagger: .12, duration: 1, ease: "power2.out", scrollTrigger: { trigger: ".security-art", start: "top 90%", once: true } });
+    });
+    const observer = new ResizeObserver(() => ScrollTrigger.refresh());
+    if (root.current) observer.observe(root.current);
+    return () => { observer.disconnect(); media.revert(); };
+  }, { scope: root });
 
-  return <>
+  useGSAP(() => {
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.from(".course-list-item", { y: 12, opacity: .65, stagger: .07, duration: .35, ease: "power2.out", clearProps: "transform,opacity" });
+    });
+    return () => media.revert();
+  }, { scope: root, dependencies: [courseTrack], revertOnUpdate: true });
+
+  useEffect(() => {
+    const onEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, []);
+
+  return <div ref={root} className="academy-root">
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="site-header wrap">
       <a className="brand" href="#" aria-label="Two Minds Academy home"><Image src="/tm-logo.svg" alt="Two Minds" width={155} height={28} priority /><span>academy</span></a>
-      <nav className="desktop-nav" aria-label="Main navigation"><a href="#disciplines">What you’ll learn</a><a href="#approach">Our approach</a><a href="#questions">FAQs</a></nav>
-      <button className="header-cta" onClick={() => enquire()}>Let’s talk <Arrow diagonal /></button>
+      <nav className="desktop-nav" aria-label="Main navigation"><a href="#disciplines">What you’ll learn</a><a href="#approach">Our approach</a><a href="#questions">FAQs</a><a href="#contact">Contact</a></nav>
+      <button className="header-cta" onClick={() => enquire()}>Talk to us <Arrow diagonal /></button>
       <button className="menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="mobile-nav" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close −" : "Menu +"}</button>
     </header>
-    {menuOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation"><a href="#disciplines" onClick={() => setMenuOpen(false)}>What you’ll learn</a><a href="#approach" onClick={() => setMenuOpen(false)}>Our approach</a><a href="#questions" onClick={() => setMenuOpen(false)}>FAQs</a><button onClick={() => enquire()}>Let’s talk <Arrow /></button></nav>}
+    {menuOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation"><a href="#disciplines" onClick={() => setMenuOpen(false)}>What you’ll learn</a><a href="#approach" onClick={() => setMenuOpen(false)}>Our approach</a><a href="#questions" onClick={() => setMenuOpen(false)}>FAQs</a><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a><button onClick={() => enquire()}>Talk to us <Arrow /></button></nav>}
 
     <main id="main">
       <section className="hero wrap">
         <div className="hero-copy">
-          <div className="eyebrow"><span className="status-dot" /> TWO MINDS. YOUR NEXT CHAPTER.</div>
-          <h1>Don’t just<br />learn tech.<br /><span>Make your</span><br /><span className="last-line">mark.<span className="asterisk" aria-hidden="true">✳</span></span></h1>
-          <p>Build things that work. Understand how they break.<br className="desktop-break" /> Learn development and cybersecurity, from your<br className="desktop-break" /> first step to your next big move.</p>
-          <a href="#paths" className="button button-dark">Find your learning path <Arrow diagonal /></a>
-          <div className="hero-note"><span className="tiny-lines" aria-hidden="true">{"///"}</span> Real projects. Human guidance. Your pace forward.</div>
+          <div className="eyebrow"><span className="status-dot" /> DEVELOPMENT & CYBERSECURITY COURSES</div>
+          <h1>Learn to code.<br />Learn to secure.<br /><span>Build your future.</span></h1>
+          <p>Practical courses and mentoring for beginners, university students, and graduates. Build real projects, get help with university work, or sharpen your skills for a career in tech.</p>
+          <a href="#paths" className="button button-dark">Explore our courses <Arrow diagonal /></a>
+          <div className="hero-note"><span className="tiny-lines" aria-hidden="true">{"///"}</span> Beginner to advanced · Projects & personal guidance</div>
         </div>
         <div className="hero-art">
           <div className="art-top"><span>THE TWO MINDS MINDSET</span><span className="art-cross">+</span></div>
@@ -113,23 +153,35 @@ export default function Academy() {
       <div className="principles wrap"><span>FROM FIRST STEPS TO WHAT’S NEXT</span><p>Before university</p><i>↗</i><p>During university</p><i>↗</i><p>Career beginnings</p><i>↗</i><p>Beyond the basics</p></div>
 
       <section className="section wrap" id="disciplines">
-        <div className="section-heading"><div><span className="eyebrow">01 — THE DISCIPLINES</span><h2>Two ways in.<br />A world of possibility.</h2></div><p>Choose what sparks your curiosity.<br />We’ll help you turn it into a skill.</p></div>
+        <div className="section-heading"><div><span className="eyebrow">01 — THE DISCIPLINES</span><h2>What do you<br />want to learn?</h2></div><p>Choose what sparks your curiosity.<br />We’ll help you turn it into a skill.</p></div>
         <div className="discipline-grid">
-          <article className="discipline development"><div className="card-meta"><span>01 / DEVELOPMENT</span><span aria-hidden="true">&lt;/&gt;</span></div><div className="code-art" aria-hidden="true"><span className="code-bracket">&#123;</span><div><span>idea</span><span className="code-arrow">↳ <b>reality</b><i /></span></div><span className="code-bracket">&#125;</span></div><h3>From “what if”<br />to “I built this.”</h3><p>Learn to turn ideas into websites, applications, and systems people can actually use.</p><div className="tags"><span>Laravel</span><span>React & Next.js</span><span>Node.js</span><span>Git & Docker</span><span>AI-assisted coding</span></div><button className="card-link" onClick={() => browse("Development")}>Explore development <Arrow diagonal /></button></article>
-          <article className="discipline cybersecurity"><div className="card-meta"><span>02 / CYBERSECURITY</span><svg aria-hidden="true" width="25" height="27" viewBox="0 0 24 26" fill="none"><path d="M12 2 3 6v7c0 5 9 11 9 11s9-6 9-11V6z" stroke="currentColor" strokeWidth="1.4" /></svg></div><div className="security-art" aria-hidden="true"><div className="target target-one"/><div className="target target-two"/><div className="target target-three"/><span>+</span><i className="scan-line" /></div><h3>See the weakness.<br />Be the defense.</h3><p>Understand how systems are attacked, find vulnerabilities, and learn to protect what matters.</p><div className="tags"><span>Networking</span><span>Linux</span><span>Web security</span><span>Bug bounty</span><span>API & mobile</span></div><button className="card-link" onClick={() => browse("Cybersecurity")}>Explore cybersecurity <Arrow diagonal /></button></article>
+          <article className="discipline development"><div className="card-meta"><span>01 / DEVELOPMENT</span><span aria-hidden="true">&lt;/&gt;</span></div><div className="code-art" aria-hidden="true"><span className="code-bracket">&#123;</span><div><span>idea</span><span className="code-arrow">↳ <b>reality</b><i /></span></div><span className="code-bracket">&#125;</span></div><h3>Build websites.<br />Create applications.</h3><p>Learn to turn ideas into websites, applications, and systems people can actually use.</p><div className="tags"><span>Laravel</span><span>React & Next.js</span><span>Node.js</span><span>Git & Docker</span><span>AI-assisted coding</span></div><button className="card-link" onClick={() => browse("Development")}>Explore development <Arrow diagonal /></button></article>
+          <article className="discipline cybersecurity"><div className="card-meta"><span>02 / CYBERSECURITY</span><svg aria-hidden="true" width="25" height="27" viewBox="0 0 24 26" fill="none"><path d="M12 2 3 6v7c0 5 9 11 9 11s9-6 9-11V6z" stroke="currentColor" strokeWidth="1.4" /></svg></div><div className="security-art" aria-hidden="true"><div className="target target-one"/><div className="target target-two"/><div className="target target-three"/><span>+</span><i className="scan-line" /></div><h3>Understand threats.<br />Protect systems.</h3><p>Understand how systems are attacked, find vulnerabilities, and learn to protect what matters.</p><div className="tags"><span>Networking</span><span>Linux</span><span>Web security</span><span>Bug bounty</span><span>API & mobile</span></div><button className="card-link" onClick={() => browse("Cybersecurity")}>Explore cybersecurity <Arrow diagonal /></button></article>
         </div>
       </section>
 
       <section className="paths-section section" id="paths"><div className="wrap">
-        <div className="section-heading"><div><span className="eyebrow">02 — YOUR STARTING POINT</span><h2>Meet yourself<br />where you are.</h2></div><p>No one-size-fits-all syllabus.<br />Start with your stage. Find your direction.</p></div>
-        <div className="stage-tabs" role="group" aria-label="Choose your starting point">{stages.map((name, i) => <button key={name} aria-pressed={stage === i} className={stage === i ? "active" : ""} onClick={() => setStage(i)}><span>0{i + 1}</span>{name}<span className="tab-dot" /></button>)}</div>
-        <div className="program-list" aria-live="polite">{programs[stage].map((item, i) => <button key={item.title} className={`program-row ${interest === item.track ? "highlighted" : ""}`} onClick={() => showProgram(item)}><span className="program-number">0{i + 1}</span><div className="program-title"><span className="eyebrow">{item.track} <span className="small-divider">/</span> {item.level}</span><h3>{item.title}</h3><p>{item.description}</p></div><span className="round-arrow"><Arrow diagonal /></span></button>)}</div>
-        <div className="path-help"><span>Not sure where you fit? That’s a perfectly good place to start.</span><button onClick={() => enquire()}>Let’s figure it out <Arrow /></button></div>
+        <div className="section-heading"><div><span className="eyebrow">02 — OUR COURSES</span><h2>What would you<br />like to learn?</h2></div><p>Pick a subject to see the courses.<br />There’s a place to start at every level.</p></div>
+        <div className="course-choices">
+          {(["Development", "Cybersecurity"] as Track[]).map((track, trackIndex) => <article className={`course-choice ${courseTrack === track ? "is-expanded" : ""}`} key={track}>
+            <span className="course-symbol" aria-hidden="true">{trackIndex === 0 ? "</>" : "+"}</span>
+            <h3>{track}</h3>
+            <p>{trackIndex === 0 ? "Learn to code and build websites and apps." : "Learn to find security weaknesses and protect systems."}</p>
+            <span className="course-level-note">Beginner to advanced</span>
+            <button className="course-toggle" aria-expanded={courseTrack === track} aria-controls={`courses-${trackIndex}`} onClick={() => setCourseTrack(courseTrack === track ? null : track)}>{courseTrack === track ? "Hide courses" : "See courses"}<span className="course-toggle-mark" aria-hidden="true">{courseTrack === track ? "−" : "+"}</span><span className="sr-only"> in {track}</span></button>
+            <div id={`courses-${trackIndex}`} hidden={courseTrack !== track} className="course-list">
+              {programs.map((pair, index) => <button className="course-list-item" key={pair[trackIndex].title} onClick={() => showProgram(pair[trackIndex], index)}>
+                <span><strong>{(trackIndex === 0 ? ["Coding for beginners", "University course & project help", "Job & freelance preparation", "Advanced development"] : ["Cybersecurity for beginners", "Networking & web security", "Security testing & bug bounty", "Advanced web, API & mobile security"])[index]}</strong><small>{["No experience needed", "For university students", "For your next career step", "For learners with experience"][index]}</small><span className="course-details-label">View course details</span></span><Arrow />
+              </button>)}
+            </div>
+          </article>)}
+        </div>
+        <div className="course-guidance"><div><h3>Not sure what to choose?</h3><p>Tell us your goal. We’ll recommend where to start.</p></div><button className="button button-dark" onClick={() => enquire()}>Help me choose <Arrow /></button></div>
       </div></section>
 
       <section className="approach section wrap" id="approach"><div className="approach-intro"><span className="eyebrow">03 — THE WAY WE LEARN</span><h2>Less watching.<br />More <span className="underlined">doing.</span></h2><p>Knowledge sticks when you use it. Every path connects the fundamentals to something you can build, test, or explain.</p><a className="agency-link" href="https://twomindsengine.com" target="_blank" rel="noopener noreferrer">An academy by Two Minds.<br /><span>The agency behind the mindset. <Arrow diagonal /></span></a></div><div className="approach-steps">{[{ title: "Understand the why.", text: "Build the foundations. Learn what’s happening behind the code, not just what to type." }, { title: "Get your hands on it.", text: "Work through practical projects and controlled security labs. Try, break, debug, repeat." }, { title: "Make the work yours.", text: "Use feedback to improve your decisions. Leave with work you understand and can confidently show." }].map((item, i) => <article key={item.title}><span>0{i + 1}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></article>)}</div></section>
 
-      <section className="university wrap"><div className="uni-symbol" aria-hidden="true">↗</div><div><span className="eyebrow">FOR THE “I HAVE A DEADLINE” MOMENTS</span><h2>A little stuck at uni?<br />Let’s connect the dots.</h2><p>Technical courses, tricky concepts, and graduation projects.<br />Get guidance that helps you do the work—and understand it.</p></div><button className="button button-outline" onClick={() => enquire("University course / project support")}>Get university support <Arrow diagonal /></button></section>
+      <section className="university wrap"><div className="uni-symbol" aria-hidden="true">↗</div><div><span className="eyebrow">FOR THE “I HAVE A DEADLINE” MOMENTS</span><h2>University courses.<br />Project support.</h2><p>Technical courses, tricky concepts, and graduation projects.<br />Get guidance that helps you do the work—and understand it.</p></div><button className="button button-outline" onClick={() => enquire("University course / project support")}>Get university support <Arrow diagonal /></button></section>
 
       <section className="faq-section section wrap" id="questions"><div><span className="eyebrow">04 — GOOD QUESTIONS</span><h2>A little clarity.<br />A better start.</h2></div><div className="faq-list">{[
         ["Do I need any experience?", "No. The foundation paths start from the beginning. If you already have experience, tell us what you’ve worked on so we can recommend a suitable starting point."],
@@ -140,15 +192,19 @@ export default function Academy() {
         ["Where do cybersecurity exercises happen?", "In isolated labs and environments you have explicit permission to test. Responsible practice, clear scope, reporting, and remediation are part of the learning process."],
       ].map(([question, answer]) => <details key={question}><summary>{question}<span className="faq-plus" aria-hidden="true">+</span></summary><p>{answer}</p></details>)}</div></section>
 
+      <section className="contact-section section wrap" id="contact"><div className="section-heading"><div><span className="eyebrow">LET’S PLAN YOUR NEXT STEP</span><h2>Questions?<br />Talk to us directly.</h2></div><p>Ask about courses, schedules, and fees.<br />Choose WhatsApp or call either of us.</p></div><ContactOptions /></section>
+
       <section className="closing"><div className="wrap closing-inner"><div className="eyebrow"><span className="status-dot" /> YOUR NEXT CHAPTER STARTS WITH A CONVERSATION</div><div className="closing-row"><h2>Curiosity got you here.<br />Let’s see <span>where it goes.</span></h2><button className="closing-button" aria-label="Let’s find your path" onClick={() => enquire()}><Arrow diagonal /></button></div><div className="closing-caption"><p>Tell us where you are. We’ll help you work out what’s next.</p><button onClick={() => enquire()}>Let’s find your path <Arrow /></button></div></div></section>
     </main>
 
-    <footer className="wrap footer"><a className="brand" href="#" aria-label="Back to Two Minds Academy home"><Image src="/tm-logo.svg" alt="Two Minds" width={155} height={28} /><span>academy</span></a><span>Two disciplines. One stronger future.</span><a href="https://twomindsengine.com" target="_blank" rel="noopener noreferrer">Meet Two Minds <Arrow diagonal /></a><div className="footer-bottom"><span>© {new Date().getFullYear()} Two Minds Academy</span><a href="mailto:info@wearetwominds.com">info@wearetwominds.com</a><span>Built with purpose.</span></div></footer>
+    <footer className="wrap footer"><a className="brand" href="#" aria-label="Back to Two Minds Academy home"><Image src="/tm-logo.svg" alt="Two Minds" width={155} height={28} /><span>academy</span></a><span>Two disciplines. One stronger future.</span><a href="https://twomindsengine.com" target="_blank" rel="noopener noreferrer">Meet Two Minds <Arrow diagonal /></a><div className="footer-bottom"><span>© {new Date().getFullYear()} Two Minds Academy</span><a href="#contact">Call or WhatsApp our team <Arrow diagonal /></a><span>Built with purpose.</span></div></footer>
 
     <dialog ref={dialog} className="detail-dialog" onCancel={() => setModal(null)} onClick={e => { if (e.target === e.currentTarget) setModal(null); }} aria-labelledby="dialog-title"><div className="dialog-inner"><button className="dialog-close" onClick={() => setModal(null)} aria-label="Close dialog">×</button>
-      {modal === "program" && program ? <><span className="eyebrow">{program.track} / {program.level}</span><h2 id="dialog-title">{program.title}</h2><p>{program.description}</p><h3>What you’ll work on</h3><ol className="module-list">{program.modules.map(module => <li key={module}>{module}</li>)}</ol><div className="outcome"><span className="eyebrow">WHAT YOU’RE WORKING TOWARD</span><p>{program.outcome}</p></div><p className="fine-print">The scope, format, schedule, and fees are agreed with you before you start.</p><button className="button button-dark" onClick={() => enquire(program.title)}>Talk about this path <Arrow diagonal /></button></> : <><span className="eyebrow">A CONVERSATION, NOT A COMMITMENT</span><h2 id="dialog-title">Your next step.<br />Let’s find it.</h2><p>Tell us a little about yourself. We’ll help you explore a learning path that makes sense.</p><form onSubmit={submitEnquiry}><div className="form-grid"><label>Your name<input name="name" autoComplete="name" placeholder="What should we call you?" required maxLength={100} /></label><label>Email address<input name="email" type="email" autoComplete="email" placeholder="you@example.com" required maxLength={180} /></label></div><label>Where are you starting?<select name="stage" defaultValue={stages[stage]}>{stages.map(s => <option key={s}>{s}</option>)}</select></label><label>What are you interested in?<select name="interest" value={interest} onChange={e => setInterest(e.target.value)}>{Array.from(new Set([interest, "Help me choose", "Development", "Cybersecurity", "University course / project support"])).map(s => <option key={s}>{s}</option>)}</select></label><label>What would you like to achieve? <span className="optional">(optional)</span><textarea name="goal" rows={3} maxLength={1500} placeholder="An idea, a skill, a career move…" /></label><p className="fine-print">This opens a prepared message in your email app. Your details are only shared when you send it.</p><button className="button button-dark" type="submit">Prepare my enquiry <Arrow diagonal /></button>{emailReady && <div className="email-feedback" role="status">Your enquiry is ready in your email app. Send it there to reach us. If it didn’t open, <a href={emailLink}>open the draft again</a> or email <a href="mailto:info@wearetwominds.com">info@wearetwominds.com</a>.</div>}</form></>}
+      {modal === "program" && program ? <><span className="eyebrow">{program.track} / {program.level}</span><h2 id="dialog-title">{program.title}</h2><p>{program.description}</p><h3>What you’ll work on</h3><ol className="module-list">{program.modules.map(module => <li key={module}>{module}</li>)}</ol><div className="outcome"><span className="eyebrow">WHAT YOU’RE WORKING TOWARD</span><p>{program.outcome}</p></div><p className="fine-print">The scope, format, schedule, and fees are agreed with you before you start.</p><button className="button button-dark" onClick={() => enquire(program.title)}>Talk about this path <Arrow diagonal /></button></> : <><span className="eyebrow">LET’S FIND THE RIGHT COURSE</span><h2 id="dialog-title">Talk to our team.</h2><p>Ask about the learning path, schedule, and fees. Choose who you’d like to speak with.</p>{interest !== "Help me choose" && <div className="contact-interest"><span className="eyebrow">YOU’RE INTERESTED IN</span><p>{interest}</p></div>}<ContactOptions message={`Hi Two Minds Academy! ${interest === "Help me choose" ? "I'd like help choosing a course." : `I'm interested in ${interest}.`}${stage !== null ? ` My starting point: ${stages[stage]}.` : ""} Could you share the schedule and fees?`} /><p className="fine-print">WhatsApp opens with a message you can edit before sending.</p></>}
+
     </div></dialog>
-  </>;
+    <nav className="mobile-action-bar" aria-label="Quick actions"><a href="#paths">View courses <Arrow /></a><button onClick={() => enquire()}>Talk to us <Arrow diagonal /></button></nav>
+  </div>;
 }
 
 
