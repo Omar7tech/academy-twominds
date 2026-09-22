@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Two Minds Academy
 
-## Getting Started
+A responsive academy website built with Next.js 16 and React 19. The brand direction and content principles live in DESIGN.md.
 
-First, run the development server:
+## Local development
 
-```bash
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Run `npm run lint` and `npm run build` to validate. Run `npm start` to serve the production build.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content and interactions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Two disciplines: development and cybersecurity.
+- Four starting points, each with two tailored learning paths and curriculum previews.
+- University course and project support.
+- Native accessible dialogs, keyboard dismissal, mobile navigation, FAQ disclosures, and reduced-motion support.
+- Original Two Minds wordmark and locally hosted Neue Machina fonts reused from the agency project.
+- Custom procedural SVG artwork; no external image or font requests.
 
-## Learn More
+## Enquiries
 
-To learn more about Next.js, take a look at the following resources:
+The form validates the visitor's name and email, then opens a prepared message addressed to `info@wearetwominds.com`, the contact address found in the agency source. Visitors must send the message from their email app. No backend, database, analytics, or automatic email delivery is configured. The interface explains this and supplies a direct email fallback.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Launch
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Intended domain: https://academy.twomindsengine.com. Canonical metadata, robots.txt, and sitemap.xml use that domain. Hosting and DNS have not been changed.
 
-## Deploy on Vercel
+Before publishing, confirm the curriculum, delivery formats, schedules, fees, and inbox ownership. These details are deliberately enquiry-based rather than advertised as fixed offers. Confirm the agency's existing font license covers the academy site. For automated lead capture, connect a server-side email provider or CRM and add the relevant privacy information.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Main files
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- app/academy.tsx: content, learning paths, interactions, and enquiry form.
+- app/globals.css: visual system and responsive layouts.
+- app/layout.tsx: local fonts and page metadata.
+- DESIGN.md: visual direction and design constraints.
