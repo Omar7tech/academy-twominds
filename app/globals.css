@@ -1940,8 +1940,15 @@ button svg,a svg {
 .contact-person-heading { display:flex; align-items:center; gap:18px; }
 .contact-photo { width:64px; height:64px; border-radius:50%; object-fit:cover; flex-shrink:0; border:1px solid #c2c9b5; }
 .contact-role { font-size:14px; line-height:1.6; color:var(--muted); margin:8px 0 0; }
-.contact-person>.phone-number { align-self:flex-start; display:flex; align-items:center; gap:12px; min-height:48px; margin-top:24px; font-size:17px; }
-.contact-person>.contact-email { align-self:flex-start; display:flex; align-items:center; gap:12px; min-height:36px; margin-top:10px; font-size:15px; word-break:break-all; }
+.contact-credentials { display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-top:12px; }
+.cert-badge { display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--muted); padding-right:16px; border-right:1px solid currentColor; opacity:.9; transition:opacity .15s, color .15s; }
+.cert-badge:hover, .cert-badge:focus-visible { opacity:1; color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
+.contact-section .contact-person:first-child .cert-badge:hover, .contact-section .contact-person:first-child .cert-badge:focus-visible { color:var(--lime); }
+.cert-logo { border-radius:4px; flex-shrink:0; width:16px; height:16px; }
+.linkedin-link { display:inline-flex; align-items:center; gap:5px; min-height:auto; font-size:13px; }
+.linkedin-link svg { width:15px; height:15px; }
+.contact-person>.phone-number { align-self:flex-start; display:flex; align-items:center; gap:12px; min-height:48px; margin-top:16px; font-size:17px; }
+.contact-person>.contact-email { align-self:flex-start; display:flex; align-items:center; gap:12px; min-height:36px; margin-top:8px; font-size:15px; word-break:break-all; }
 .contact-section .contact-person { padding:34px; border:1px solid #c2c9b5; background:#e7ebde; }
 .contact-section .contact-person h3 { font-size:32px; letter-spacing:-1px; }
 .contact-section .contact-actions { border-top:1px solid #c2c9b5; padding-top:24px; margin-top:28px; }
@@ -1963,6 +1970,11 @@ button svg,a svg {
 .detail-dialog .contact-role { font-size:13px; margin-top:5px; }
 .detail-dialog .contact-person>.phone-number { margin-top:10px; min-height:44px; font-size:15px; }
 .detail-dialog .contact-person>.contact-email { margin-top:8px; min-height:32px; font-size:13px; }
+.detail-dialog .contact-credentials { margin-top:8px; gap:6px 12px; }
+.detail-dialog .cert-badge, .detail-dialog .linkedin-link { font-size:11px; min-height:auto; }
+.detail-dialog .cert-badge { padding-right:12px; }
+.detail-dialog .cert-logo { width:14px; height:14px; }
+.detail-dialog .linkedin-link svg { width:12px; height:12px; }
 .detail-dialog .contact-actions { margin-top:10px; }
 @media (max-width:767px) {
   .contact-section .section-heading h2 { font-size:31px; }
@@ -1971,8 +1983,9 @@ button svg,a svg {
   .contact-section .contact-person h3 { font-size:28px; }
   .contact-card-top { margin-bottom:24px; }
   .contact-role { font-size:14px; }
-  .contact-person>.phone-number { font-size:16px; margin-top:20px; }
-  .contact-person>.contact-email { font-size:14px; margin-top:8px; }
+  .contact-person>.phone-number { font-size:16px; margin-top:14px; }
+  .contact-person>.contact-email { font-size:14px; margin-top:6px; }
+  .contact-credentials { margin-top:10px; }
   .contact-section .contact-actions { margin-top:20px; padding-top:20px; }
 }
 @media (max-width:359px) {

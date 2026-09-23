@@ -10,14 +10,18 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const contacts = [
-  { name: "Omar Abi Farraj", role: "Senior Software Engineer", subject: "Development", initials: "OA", phone: "+96171387946", display: "+961 71 387 946", email: "omar@twomindsengine.com", photo: "/team/omar.jpg" },
-  { name: "Nassir Ghraizi", role: "Expert Cybersecurity Researcher", subject: "Cybersecurity", initials: "NG", phone: "+96181670536", display: "+961 81 670 536", email: "nassir@twomindsengine.com", photo: "/team/nassir.jpg" },
+  { name: "Omar Abi Farraj", role: "Senior Software Engineer", subject: "Development", initials: "OA", phone: "+96171387946", display: "+961 71 387 946", email: "omar@twomindsengine.com", photo: "/team/omar.jpg", linkedin: "https://www.linkedin.com/in/omar-abi-farraj-a24429284/", certifiedBy: null as { name: string; logo: string; url: string } | null },
+  { name: "Nassir Ghraizi", role: "Expert Cybersecurity Researcher", subject: "Cybersecurity", initials: "NG", phone: "+96181670536", display: "+961 81 670 536", email: "nassir@twomindsengine.com", photo: "/team/nassir.jpg", linkedin: "https://linkedin.com/in/nassirgh", certifiedBy: { name: "Semicolon Security", logo: "/semicolon/academy_semicolon_logo.jpg", url: "https://semsec.org/" } },
 ];
 
 function ContactOptions({ message = "Hi Two Minds Academy! I'd like to know more about your courses." }: { message?: string }) {
   return <div className="contact-options">{contacts.map(person => <article className="contact-person" key={person.phone}>
     <div className="contact-card-top"><span className="contact-subject">{person.subject}</span><span className="contact-monogram" aria-hidden="true">{person.initials}</span></div>
     <div className="contact-person-heading"><Image className="contact-photo" src={person.photo} alt={person.name} width={64} height={64} /><div><h3>{person.name}</h3><p className="contact-role">{person.role}</p></div></div>
+    <div className="contact-credentials">
+      {person.certifiedBy && <a className="cert-badge" href={person.certifiedBy.url} target="_blank" rel="noopener noreferrer" title={person.certifiedBy.url} aria-label={`${person.certifiedBy.name} — ${person.certifiedBy.url}`}><Image src={person.certifiedBy.logo} alt={person.certifiedBy.name} width={22} height={22} className="cert-logo" />Certified by {person.certifiedBy.name}</a>}
+      <a className="linkedin-link" href={person.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${person.name} on LinkedIn`}>LinkedIn <Arrow diagonal /></a>
+    </div>
     <a className="phone-number" href={`tel:${person.phone}`} aria-label={`Call ${person.name} at ${person.display}`}><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m7 3 3 5-3 2c2 4 3 5 7 7l2-3 5 3c-1 5-4 5-8 3C6 17 2 11 3 6c0-2 2-3 4-3Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></svg>{person.display}</a>
     <a className="contact-email" href={`mailto:${person.email}`} aria-label={`Email ${person.name} at ${person.email}`}><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /><path d="m4 6.5 8 6.5 8-6.5" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></svg>{person.email}</a>
     <div className="contact-actions"><a className="button button-dark" href={`https://wa.me/${person.phone.slice(1)}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${person.name}`}>WhatsApp <Arrow diagonal /></a><a className="call-link" href={`tel:${person.phone}`} aria-label={`Call ${person.name}`}>Call <Arrow diagonal /></a></div>
