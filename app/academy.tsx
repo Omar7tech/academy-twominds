@@ -77,6 +77,30 @@ function Sculpture() {
   return <svg className="sculpture" viewBox="0 0 540 490" role="img" aria-label="Two interlocking wireframe rings representing development and cybersecurity"><g fill="none" stroke="currentColor" strokeWidth=".75">{paths.map((p, i) => <path key={i} d={p.d} opacity={p.opacity.toFixed(4)} />)}</g></svg>;
 }
 
+// A stylized, deterministic nod to a QR code — not a real, scannable one. Same trick as
+// Sculpture above: computed from fixed math rather than random or an image, so it's
+// identical on server and client. Three finder-style corner markers (their centers
+// picked out in lime, echoing the .target rings used for the cybersecurity discipline)
+// plus a sparse data field.
+function ToolsGlyph() {
+  const size = 11;
+  const finders: [number, number][] = [[0, 0], [0, 6], [6, 0]];
+  const cells: { on: boolean; core: boolean }[] = [];
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const finder = finders.find(([fr, fc]) => r >= fr && r < fr + 5 && c >= fc && c < fc + 5);
+      if (finder) {
+        const rr = r - finder[0], cc = c - finder[1];
+        const core = rr === 2 && cc === 2;
+        cells.push({ on: core || rr === 0 || rr === 4 || cc === 0 || cc === 4, core });
+      } else {
+        cells.push({ on: (r * 5 + c * 3 + r * c) % 4 === 0, core: false });
+      }
+    }
+  }
+  return <div className="tools-grid" role="presentation">{cells.map((cell, i) => <span key={i} className={`tools-cell${cell.on ? " on" : ""}${cell.core ? " core" : ""}`} />)}</div>;
+}
+
 export default function Academy() {
   const [stage, setStage] = useState<number | null>(null);
   const [courseTrack, setCourseTrack] = useState<Track | null>(null);
@@ -111,7 +135,7 @@ export default function Academy() {
       gsap.from(".hero-copy > *", { y: 22, duration: .8, stagger: .08, ease: "power3.out", clearProps: "transform" });
       gsap.from(".hero-art", { opacity: .5, scale: .97, duration: 1.1, ease: "power3.out", clearProps: "transform,opacity" });
       gsap.fromTo(".sculpture", { rotation: -7 }, { rotation: 8, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 } });
-      root.current?.querySelectorAll(".section-heading, .discipline, .approach-steps article, .university, .contact-section, .closing-inner").forEach(element => {
+      root.current?.querySelectorAll(".section-heading, .discipline, .approach-steps article, .university, .tools-card, .contact-section, .closing-inner").forEach(element => {
         gsap.from(element, { y: 26, opacity: .65, duration: .7, ease: "power3.out", clearProps: "transform,opacity", scrollTrigger: { trigger: element, start: "top 94%", once: true } });
       });
       gsap.from(".target", { scale: .7, opacity: .25, stagger: .12, duration: 1, ease: "power2.out", scrollTrigger: { trigger: ".security-art", start: "top 90%", once: true } });
@@ -146,11 +170,11 @@ export default function Academy() {
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="site-header wrap">
       <a className="brand" href="#" aria-label="Two Minds Academy home"><Image src="/tm-logo.svg" alt="Two Minds" width={155} height={28} priority /><span>academy</span></a>
-      <nav className="desktop-nav" aria-label="Main navigation"><a href="#disciplines">What you’ll learn</a><a href="#approach">Our approach</a><a href="#questions">FAQs</a><a href="#contact">Contact</a></nav>
+      <nav className="desktop-nav" aria-label="Main navigation"><a href="#disciplines">What you’ll learn</a><a href="#approach">Our approach</a><a href="#tools">Free tools</a><a href="#questions">FAQs</a><a href="#contact">Contact</a></nav>
       <button className="header-cta" onClick={() => enquire()}>Talk to us <Arrow diagonal /></button>
       <button className="menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="mobile-nav" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close −" : "Menu +"}</button>
     </header>
-    {menuOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation"><a href="#disciplines" onClick={e => { e.preventDefault(); navigateTo("disciplines"); }}>What you’ll learn</a><a href="#approach" onClick={e => { e.preventDefault(); navigateTo("approach"); }}>Our approach</a><a href="#questions" onClick={e => { e.preventDefault(); navigateTo("questions"); }}>FAQs</a><a href="#contact" onClick={e => { e.preventDefault(); navigateTo("contact"); }}>Contact</a><button onClick={() => enquire()}>Talk to us <Arrow /></button></nav>}
+    {menuOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation"><a href="#disciplines" onClick={e => { e.preventDefault(); navigateTo("disciplines"); }}>What you’ll learn</a><a href="#approach" onClick={e => { e.preventDefault(); navigateTo("approach"); }}>Our approach</a><a href="#tools" onClick={e => { e.preventDefault(); navigateTo("tools"); }}>Free tools</a><a href="#questions" onClick={e => { e.preventDefault(); navigateTo("questions"); }}>FAQs</a><a href="#contact" onClick={e => { e.preventDefault(); navigateTo("contact"); }}>Contact</a><button onClick={() => enquire()}>Talk to us <Arrow /></button></nav>}
 
     <main id="main">
       <section className="hero wrap">
@@ -200,6 +224,21 @@ export default function Academy() {
       <section className="approach section wrap" id="approach"><div className="approach-intro"><span className="eyebrow">03 — THE WAY WE LEARN</span><h2>Less watching.<br />More <span className="underlined">doing.</span></h2><p>Knowledge sticks when you use it. Every path connects the fundamentals to something you can build, test, or explain.</p><a className="agency-link" href="https://twomindsengine.com" target="_blank" rel="noopener noreferrer">An academy by Two Minds.<br /><span>The agency behind the mindset. <Arrow diagonal /></span></a></div><div className="approach-steps">{[{ title: "Understand the why.", text: "Build the foundations. Learn what’s happening behind the code, not just what to type." }, { title: "Get your hands on it.", text: "Work through practical projects and controlled security labs. Try, break, debug, repeat." }, { title: "Make the work yours.", text: "Use feedback to improve your decisions. Leave with work you understand and can confidently show." }].map((item, i) => <article key={item.title}><span>0{i + 1}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></article>)}</div></section>
 
       <section className="university wrap"><div className="uni-symbol" aria-hidden="true">↗</div><div><span className="eyebrow">FOR THE “I HAVE A DEADLINE” MOMENTS</span><h2>University courses.<br />Project support.</h2><p>Technical courses, tricky concepts, and graduation projects.<br />Get guidance that helps you do the work—and understand it.</p></div><button className="button button-outline" onClick={() => enquire("University course / project support")}>Get university support <Arrow diagonal /></button></section>
+
+      <section className="tools-promo section wrap" id="tools"><article className="tools-card">
+        <div className="tools-copy">
+          <span className="eyebrow">FREE &amp; OPEN SOURCE · BUILT BY US</span>
+          <h2>Don’t just learn it.<br />Ship it for real.</h2>
+          <p>TM Tools is our own free, open-source toolkit—a QR code generator, icon library, snippet editor, and docs, built the way we teach. Practice on it as a student, build on it as a developer, or just use it because it’s free.</p>
+          <div className="tags"><span>QR Code Generator</span><span>Icon Library</span><span>Snippet Editor</span><span>Docs &amp; Guides</span></div>
+          <a className="button button-dark" href="https://tools.twomindsengine.com" target="_blank" rel="noopener noreferrer">Explore TM Tools <Arrow diagonal /></a>
+        </div>
+        <div className="tools-art" aria-hidden="true">
+          <div className="art-top"><span>TM TOOLS</span><span className="tools-pill">FREE</span></div>
+          <div className="tools-glyph-area"><ToolsGlyph /></div>
+          <div className="tools-art-bottom"><span>tools.twomindsengine.com<i className="blink-cursor" /></span><span>OPEN SOURCE</span></div>
+        </div>
+      </article></section>
 
       <section className="faq-section section wrap" id="questions"><div><span className="eyebrow">04 — GOOD QUESTIONS</span><h2>A little clarity.<br />A better start.</h2></div><div className="faq-list">{[
         ["Do I need any experience?", "No. The foundation paths start from the beginning. If you already have experience, tell us what you’ve worked on so we can recommend a suitable starting point."],
