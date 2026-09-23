@@ -1037,6 +1037,7 @@ button svg,a svg {
   min-height:44px;
   display:flex;
   align-items:center;
+  color:inherit;
 }
 
 .skip-link {
@@ -1789,6 +1790,7 @@ button svg,a svg {
 .contact-person-heading { display:block; }
 .contact-role { font-size:14px; line-height:1.6; color:var(--muted); margin:8px 0 0; }
 .contact-person>.phone-number { align-self:flex-start; display:flex; align-items:center; gap:12px; min-height:48px; margin-top:24px; font-size:17px; }
+.contact-person>.contact-email { align-self:flex-start; display:flex; align-items:center; gap:12px; min-height:36px; margin-top:10px; font-size:15px; word-break:break-all; }
 .contact-section .contact-person { padding:34px; border:1px solid #c2c9b5; background:#e7ebde; }
 .contact-section .contact-person h3 { font-size:32px; letter-spacing:-1px; }
 .contact-section .contact-actions { border-top:1px solid #c2c9b5; padding-top:24px; margin-top:28px; }
@@ -1807,6 +1809,7 @@ button svg,a svg {
 .detail-dialog .contact-subject { font-size:10px; }
 .detail-dialog .contact-role { font-size:13px; margin-top:5px; }
 .detail-dialog .contact-person>.phone-number { margin-top:10px; min-height:44px; font-size:15px; }
+.detail-dialog .contact-person>.contact-email { margin-top:8px; min-height:32px; font-size:13px; }
 .detail-dialog .contact-actions { margin-top:10px; }
 @media (max-width:767px) {
   .contact-section .section-heading h2 { font-size:31px; }
@@ -1816,6 +1819,7 @@ button svg,a svg {
   .contact-card-top { margin-bottom:24px; }
   .contact-role { font-size:14px; }
   .contact-person>.phone-number { font-size:16px; margin-top:20px; }
+  .contact-person>.contact-email { font-size:14px; margin-top:8px; }
   .contact-section .contact-actions { margin-top:20px; padding-top:20px; }
 }
 @media (max-width:359px) {
