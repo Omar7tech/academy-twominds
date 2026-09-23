@@ -96,6 +96,14 @@ export default function Academy() {
   const enquire = (topic = "Help me choose") => { setInterest(topic); setModal("enquire"); setMenuOpen(false); };
   const showProgram = (item: Program, stageIndex: number) => { setStage(stageIndex); setProgram(item); setModal("program"); };
   const browse = (track: Track) => { document.getElementById("paths")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); setInterest(track); setCourseTrack(track); };
+  const navigateTo = (id: string) => {
+    // Closing the mobile menu removes the clicked <a> from the flow (it's not a fixed
+    // overlay), which cancels the browser's default hash-jump on mobile before it can
+    // run. Close it first, then scroll to the target ourselves once the layout settles.
+    setMenuOpen(false);
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+    requestAnimationFrame(() => { document.getElementById(id)?.scrollIntoView({ behavior }); });
+  };
 
   useGSAP(() => {
     const media = gsap.matchMedia();
@@ -108,8 +116,15 @@ export default function Academy() {
       });
       gsap.from(".target", { scale: .7, opacity: .25, stagger: .12, duration: 1, ease: "power2.out", scrollTrigger: { trigger: ".security-art", start: "top 90%", once: true } });
     });
+    // Observe <main> rather than the whole root: the mobile menu (a sibling of <main>,
+    // between the header and it) mounts/unmounts as its own flow element, and observing
+    // the root here previously fired ScrollTrigger.refresh() on every open/close. That
+    // refresh does two internal window.scrollTo(0,0) calls to remeasure trigger
+    // positions and never restores the prior scroll, which was silently snapping the
+    // page back to the top right after a mobile nav link scrolled to its section.
+    const observedEl = root.current?.querySelector("main");
     const observer = new ResizeObserver(() => ScrollTrigger.refresh());
-    if (root.current) observer.observe(root.current);
+    if (observedEl) observer.observe(observedEl);
     return () => { observer.disconnect(); media.revert(); };
   }, { scope: root });
 
@@ -135,7 +150,7 @@ export default function Academy() {
       <button className="header-cta" onClick={() => enquire()}>Talk to us <Arrow diagonal /></button>
       <button className="menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="mobile-nav" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close −" : "Menu +"}</button>
     </header>
-    {menuOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation"><a href="#disciplines" onClick={() => setMenuOpen(false)}>What you’ll learn</a><a href="#approach" onClick={() => setMenuOpen(false)}>Our approach</a><a href="#questions" onClick={() => setMenuOpen(false)}>FAQs</a><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a><button onClick={() => enquire()}>Talk to us <Arrow /></button></nav>}
+    {menuOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation"><a href="#disciplines" onClick={e => { e.preventDefault(); navigateTo("disciplines"); }}>What you’ll learn</a><a href="#approach" onClick={e => { e.preventDefault(); navigateTo("approach"); }}>Our approach</a><a href="#questions" onClick={e => { e.preventDefault(); navigateTo("questions"); }}>FAQs</a><a href="#contact" onClick={e => { e.preventDefault(); navigateTo("contact"); }}>Contact</a><button onClick={() => enquire()}>Talk to us <Arrow /></button></nav>}
 
     <main id="main">
       <section className="hero wrap">
