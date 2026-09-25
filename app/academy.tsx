@@ -139,7 +139,7 @@ export default function Academy() {
       gsap.from(".hero-copy > *", { y: 22, duration: .8, stagger: .08, ease: "power3.out", clearProps: "transform" });
       gsap.from(".hero-art", { opacity: .5, scale: .97, duration: 1.1, ease: "power3.out", clearProps: "transform,opacity" });
       gsap.fromTo(".sculpture", { rotation: -7 }, { rotation: 8, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 } });
-      root.current?.querySelectorAll(".section-heading, .discipline, .approach-steps article, .university, .tools-card, .contact-section, .closing-inner").forEach(element => {
+      root.current?.querySelectorAll(".section-heading, .discipline, .approach-steps article, .university, .tools-card, .free-call-card, .contact-section, .closing-inner").forEach(element => {
         gsap.from(element, { y: 26, opacity: .65, duration: .7, ease: "power3.out", clearProps: "transform,opacity", scrollTrigger: { trigger: element, start: "top 94%", once: true } });
       });
       gsap.from(".target", { scale: .7, opacity: .25, stagger: .12, duration: 1, ease: "power2.out", scrollTrigger: { trigger: ".security-art", start: "top 90%", once: true } });
@@ -252,6 +252,22 @@ export default function Academy() {
         ["Will this guarantee me a job?", "No course can guarantee a job. Our career-focused paths help you practice relevant workflows, improve your portfolio, and prepare to discuss your work with employers or freelance clients."],
         ["Where do cybersecurity exercises happen?", "In isolated labs and environments you have explicit permission to test. Responsible practice, clear scope, reporting, and remediation are part of the learning process."],
       ].map(([question, answer]) => <details key={question}><summary>{question}<span className="faq-plus" aria-hidden="true">+</span></summary><p>{answer}</p></details>)}</div></section>
+
+      <section className="free-call section wrap" id="free-call"><article className="free-call-card">
+        <div className="free-call-copy">
+          <span className="eyebrow"><span className="status-dot" />FREE 15-MINUTE CALL</span>
+          <h2>Still deciding?<br />Let’s talk it through.</h2>
+          <p>No pitch, no pressure—just a quick WhatsApp chat with Nassir to figure out the right path, format, and timeline for you.</p>
+          <a className="button button-dark" href={`https://wa.me/96181670536?text=${encodeURIComponent("Hi Nassir! I'd like to book a free 15-minute call to learn more about Two Minds Academy.")}`} target="_blank" rel="noopener noreferrer">Book your free call <Arrow diagonal /></a>
+          <span className="free-call-note">Opens WhatsApp · Usually replies within a few hours</span>
+        </div>
+        <div className="free-call-chat" aria-hidden="true">
+          <div className="chat-header"><span className="chat-avatar">NG</span><div><span className="chat-name">Nassir Ghraizi</span><span className="chat-status"><span className="status-dot" />Online now</span></div></div>
+          <div className="chat-bubble out">Hi! I’d like to learn more about Two Minds Academy.</div>
+          <div className="chat-bubble in">Happy to help — when works best for a quick call? <span>👋</span></div>
+          <div className="chat-typing"><span /><span /><span /></div>
+        </div>
+      </article></section>
 
       <section className="contact-section section wrap" id="contact"><div className="section-heading"><div><span className="eyebrow">LET’S PLAN YOUR NEXT STEP</span><h2>A real conversation.<br />The right guidance.</h2></div><p>Meet the people behind Two Minds Academy.<br />Ask us about courses, projects, schedules, or fees.</p></div><ContactOptions /></section>
 
